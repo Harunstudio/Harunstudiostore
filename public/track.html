@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+  <!-- Favicon / Tab Icon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23080808'/%3E%3Crect width='32' height='32' rx='7' fill='none' stroke='%2334d399' stroke-width='1.5' stroke-opacity='.4'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' font-size='17' fill='%2334d399'%3ED%3C/text%3E%3C/svg%3E">
+  <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='36' fill='%23080808'/%3E%3Ctext x='90' y='90' dominant-baseline='central' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' font-size='100' fill='%2334d399'%3ED%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#080808">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Cek Order — Dongtube</title>
+<link rel="manifest" href="/manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#080808;--bg1:#0e0e0e;--bg2:#141414;--bg3:#1a1a1a;--line:rgba(255,255,255,.07);--line2:rgba(255,255,255,.12);--em:#34d399;--em2:#6ee7b7;--red:#f87171;--yellow:#fbbf24;--sky:#38bdf8;--t1:#f5f5f5;--t2:rgba(245,245,245,.55);--t3:rgba(245,245,245,.28);--t4:rgba(245,245,245,.12);--font:'Instrument Sans',sans-serif;--rad:14px;--rs:9px}
+html,body{min-height:100%;background:var(--bg);color:var(--t1);font-family:var(--font);font-size:13.5px;overscroll-behavior: none;
+}
+body{display:flex;flex-direction:column;align-items:center;padding:1.5rem 1rem 3rem}
+body::before{content:'';position:fixed;top:-120px;left:50%;transform:translateX(-50%);width:500px;height:300px;pointer-events:none;z-index:0;background:radial-gradient(ellipse,rgba(var(--em-rgb),.06) 0%,transparent 70%)}
+.wrap{width:100%;max-width:520px;position:relative;z-index:1}
+.back-btn{display:inline-flex;align-items:center;gap:.35rem;font-size:.65rem;font-weight:600;color:var(--t3);text-decoration:none;transition:color .15s;margin-bottom:1rem}
+.back-btn:hover{color:var(--t1)}
+.card{background:var(--bg1);border:1px solid var(--line2);border-radius:20px;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.03),0 32px 64px rgba(0,0,0,.7)}
+.card-head{padding:1.25rem 1.5rem;border-bottom:1px solid var(--line)}
+.card-title{font-family:'Instrument Serif',serif;font-size:1.5rem;font-weight:400;margin-bottom:.25rem}
+.card-sub{font-size:.68rem;color:var(--t3)}
+.card-body{padding:1.25rem 1.5rem}
+.f-label{font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:.35rem}
+.f-inp{width:100%;background:var(--bg2);border:1px solid var(--line2);border-radius:var(--rs);padding:.62rem .85rem;color:var(--t1);font-family:var(--font);font-size:.78rem;outline:none;transition:border-color .15s}
+.f-inp:focus{border-color:rgba(var(--em-rgb),.4)}
+.btn{display:flex;align-items:center;justify-content:center;gap:.35rem;width:100%;padding:.72rem;border-radius:var(--rs);border:none;font-family:var(--font);font-size:.78rem;font-weight:700;cursor:pointer;transition:all .18s;margin-top:.75rem}
+.btn-em{background:var(--em);color:#040d09}
+.btn-em:hover{background:var(--em2)}
+.btn-em:disabled{opacity:.4;cursor:not-allowed}
+.btn-ghost{background:var(--bg2);border:1px solid var(--line2);color:var(--t1);text-decoration:none;display:flex;justify-content:center;align-items:center}
+.btn-ghost:hover{border-color:var(--line2)}
+.results{margin-top:1.25rem}
+.order-card{background:var(--bg2);border:1px solid var(--line);border-radius:var(--rs);margin-bottom:.6rem;overflow:hidden}
+.order-head{padding:.65rem .85rem;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+.order-prod{font-weight:700;font-size:.78rem}
+.order-var{font-size:.6rem;color:var(--t3);margin-top:.1rem}
+.badge{display:inline-flex;align-items:center;font-size:.58rem;font-weight:700;padding:.15rem .5rem;border-radius:4px;text-transform:uppercase;letter-spacing:.06em}
+.badge-ok{background:rgba(var(--em-rgb),.1);color:var(--em);border:1px solid rgba(var(--em-rgb),.2)}
+.badge-pend{background:rgba(251,191,36,.08);color:var(--yellow);border:1px solid rgba(251,191,36,.15)}
+.badge-fail{background:rgba(248,113,113,.08);color:var(--red);border:1px solid rgba(248,113,113,.15)}
+.order-body{padding:.65rem .85rem;font-size:.72rem}
+.d-row{display:flex;justify-content:space-between;padding:.22rem 0;border-bottom:1px solid var(--line)}
+.d-row:last-child{border:none}
+.dk{color:var(--t3)}.dv{font-weight:600;text-align:right;max-width:65%;word-break:break-all}
+.dv.em{color:var(--em)}
+.data-box{background:var(--bg3);border:1px solid var(--line);border-radius:var(--rs);padding:.65rem .85rem;margin-top:.6rem;font-size:.72rem}
+.data-box-title{font-size:.57rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);margin-bottom:.5rem;display:flex;align-items:center;gap:.3rem}
+.mono{font-family:monospace;font-size:.74rem}
+.cp-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:.3rem}
+.cp-btn{width:22px;height:22px;background:var(--bg2);border:1px solid var(--line);border-radius:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .15s}
+.cp-btn:hover{border-color:var(--em);background:rgba(var(--em-rgb),.1)}
+.cp-btn svg{width:10px;height:10px;color:var(--t3)}
+.cp-btn:hover svg{color:var(--em)}
+.notif{position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-12px);display:flex;align-items:flex-start;gap:.5rem;padding:.65rem 1.1rem .65rem .75rem;border-radius:12px;font-size:.78rem;font-weight:700;z-index:100000;opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;white-space:normal;word-break:break-word;max-width:min(380px,92vw);backdrop-filter:blur(20px);box-shadow:0 16px 48px rgba(0,0,0,.8)}
+.notif.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.notif.ok{background:rgba(10,10,10,.98);border:2px solid rgba(var(--em-rgb),.5);color:var(--em)}
+.notif.err{background:rgba(10,10,10,.98);border:2px solid rgba(248,113,113,.5);color:var(--red)}
+.notif.info{background:rgba(10,10,10,.98);border:2px solid rgba(255,255,255,.2);color:var(--t1)}
+.notif-icon{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.notif-icon svg{width:12px;height:12px}
+.notif.ok .notif-icon{background:rgba(var(--em-rgb),.2)}
+.notif.err .notif-icon{background:rgba(248,113,113,.18)}
+.notif.info .notif-icon{background:rgba(255,255,255,.1)}
+.empty{text-align:center;padding:2rem;color:var(--t3);font-size:.75rem}
+.spin{animation:spin .7s linear infinite;display:inline-block}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.fadein{animation:fadein .3s ease}
+</style>
+</head>
+<body>
+<div class="notif" id="notif"><div class="notif-icon" id="notifIcon"></div><span id="notifMsg"></span></div>
+
+<div class="wrap">
+  <a href="/" class="back-btn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="12" height="12"><polyline points="15 18 9 12 15 6"/></svg>
+    Kembali ke Toko
+  </a>
+
+  <div class="card fadein">
+    <div class="card-head">
+      <div class="card-title">Cek Order</div>
+      <div class="card-sub">Masukkan nomor HP atau ID transaksi untuk melihat riwayat pembelian</div>
+    </div>
+    <div class="card-body">
+      <div class="f-label">Nomor HP atau ID Transaksi</div>
+      <input class="f-inp" id="queryInp" placeholder="0812xxxxxxxx  atau  TRX-xxxxxx" maxlength="40"
+        onkeydown="if(event.key==='Enter')search()">
+      <button class="btn btn-em" id="searchBtn" onclick="search()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        Cari Order
+      </button>
+
+      <div id="results" class="results"></div>
+    </div>
+  </div>
+
+  <a href="/" class="btn btn-ghost" style="margin-top:1rem;text-decoration:none">Kembali Belanja</a>
+</div>
+
+<script>
+var _nt = null;
+function notify(msg, type) {
+  var n=document.getElementById('notif'),ic=document.getElementById('notifIcon'),m=document.getElementById('notifMsg');
+  type=type||'info';
+  var icons={ok:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>',err:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',info:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>'};
+  n.className='notif '+type; ic.innerHTML=icons[type]||icons.info; m.textContent=msg;
+  n.classList.add('show'); clearTimeout(_nt); _nt=setTimeout(function(){n.classList.remove('show');},type==='err'?3500:2000);
+}
+function idr(n){return 'Rp'+Number(n).toLocaleString('id-ID');}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function fmtDate(ts){return ts?new Date(ts).toLocaleString('id-ID',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'—';}
+function cp(text){navigator.clipboard.writeText(text).then(function(){notify('Disalin','ok');});}
+
+async function search() {
+  var q = document.getElementById('queryInp').value.trim();
+  if (!q) { notify('Masukkan nomor HP atau ID transaksi', 'err'); return; }
+  var btn = document.getElementById('searchBtn');
+  btn.disabled = true; btn.textContent = 'Mencari...';
+  document.getElementById('results').innerHTML = '<div class="empty"><span class="spin"></span> Mencari...</div>';
+  try {
+    var r = await fetch('/api/history', {method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:'query='+encodeURIComponent(q)});
+    var j = await r.json();
+    if (!j.ok) { document.getElementById('results').innerHTML = '<div class="empty">'+esc(j.message)+'</div>'; notify(j.message,'err'); }
+    else renderResults(j.data);
+  } catch(e) { document.getElementById('results').innerHTML = '<div class="empty">Koneksi error.</div>'; notify('Koneksi error','err'); }
+  btn.disabled = false; btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Cari Order';
+}
+
+function renderResults(orders) {
+  var con = document.getElementById('results');
+  if (!orders.length) { con.innerHTML = '<div class="empty">Tidak ada order ditemukan.</div>'; return; }
+  con.innerHTML = orders.map(function(d) {
+    var statusBadge = d.status==='COMPLETED' ? '<span class="badge badge-ok">Selesai</span>'
+      : d.status==='PENDING'||d.status==='FREE_PENDING' ? '<span class="badge badge-pend"> Pending</span>'
+      : '<span class="badge badge-fail">'+esc(d.status)+'</span>';
+
+    var resultHtml = '';
+    if (d.status === 'COMPLETED' && d.result) {
+      var rs = d.result;
+      if (rs.type === 'panel' || rs.type === 'renewal') {
+        resultHtml = '<div class="data-box"><div class="data-box-title"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="11" height="11" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg> Data Panel</div>'
+          + cpRow('Domain', rs.domain)
+          + cpRow('Username', rs.username)
+          + cpRow('Password', rs.password||'(tidak berubah)')
+          + (rs.expiresAt?'<div class="d-row"><span class="dk">Expired</span><span class="dv">'+fmtDate(rs.expiresAt)+'</span></div>':'')
+          + '</div>';
+      } else if (rs.type === 'sewabot') {
+        resultHtml = '<div class="data-box"><div class="data-box-title">🤖 Info Sewa Bot</div>'
+          + (rs.groupUrl ? '<div class="d-row"><span class="dk">Link Grup</span><div style="display:flex;align-items:center;gap:.3rem"><a href="'+esc(rs.groupUrl)+'" target="_blank" rel="noopener" style="color:var(--sky);font-size:.7rem;word-break:break-all">'+esc(rs.groupUrl)+'</a><button class="cp-btn" onclick="cp('+JSON.stringify(rs.groupUrl)+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>' : '<div class="d-row"><span class="dk">Link Grup</span><span class="dv" style="color:var(--t4);font-style:italic">Belum ada — hubungi admin</span></div>')
+          + (rs.days?'<div class="d-row"><span class="dk">Durasi</span><span class="dv em">'+esc(String(rs.days))+' Hari</span></div>':'')
+          + '<div class="d-row"><span class="dk">Catatan</span><span class="dv" style="color:var(--t3);font-size:.67rem">Jika dalam 1×24 jam bot belum dipasang, hubungi admin dengan ID order di atas.</span></div>'
+          + '</div>';
+      } else if (rs.type === 'content') {
+        if (rs.contentType === 'link' && rs.contentUrl) {
+          resultHtml = '<div class="data-box"><div class="data-box-title">Link Produk</div><a href="'+esc(rs.contentUrl)+'" target="_blank" rel="noopener" style="color:var(--sky);font-size:.72rem;word-break:break-all">'+esc(rs.contentUrl)+'</a></div>';
+        } else if (rs.contentText) {
+          resultHtml = '<div class="data-box"><div class="data-box-title">Konten Produk</div><div class="mono" style="white-space:pre-wrap;word-break:break-word;color:var(--t1);font-size:.7rem">'+esc(rs.contentText)+'</div><button onclick="cp('+JSON.stringify(rs.contentText)+')" style="margin-top:.5rem;font-size:.6rem;color:var(--em);background:none;border:1px solid rgba(52,211,153,.2);border-radius:5px;padding:.2rem .5rem;cursor:pointer;font-family:var(--font)">Salin</button></div>';
+        } else if (rs.contentUrl) {
+          resultHtml = '<div class="data-box"><div class="data-box-title">File/Media</div><a href="'+esc(rs.contentUrl)+'" download target="_blank" class="btn btn-em" style="width:auto;display:inline-flex;padding:.4rem .85rem;font-size:.65rem;margin-top:.3rem">Download</a></div>';
+        }
+      }
+    }
+
+    return '<div class="order-card fadein"><div class="order-head"><div><div class="order-prod">'+esc(d.productName)+'</div><div class="order-var">'+esc(d.variantName)+'</div></div>'+statusBadge+'</div>'
+      + '<div class="order-body">'
+      + '<div class="d-row"><span class="dk">ID</span><span class="dv mono">'+esc(d.id)+'</span></div>'
+      + '<div class="d-row"><span class="dk">Tanggal</span><span class="dv">'+fmtDate(d.createdAt)+'</span></div>'
+      + '<div class="d-row"><span class="dk">Total</span><span class="dv em">'+idr(d.totalBayar||0)+'</span></div>'
+      + (d.phone?'<div class="d-row"><span class="dk">HP</span><span class="dv">'+esc(d.phone)+'</span></div>':'')
+      + resultHtml
+      + (d.status==='COMPLETED'?'<div style="margin-top:.55rem"><a href="/pay?id='+esc(d.id)+'" target="_blank" style="font-size:.65rem;color:var(--t3);text-decoration:none;transition:color .15s" onmouseover="this.style.color=\'var(--t1)\'" onmouseout="this.style.color=\'var(--t3)\'">Lihat halaman bayar →</a></div>':'')
+      + '</div></div>';
+  }).join('');
+}
+
+function cpRow(label, val) {
+  if (!val) return '';
+  return '<div class="cp-row"><span style="color:var(--t3)">' + esc(label) + '</span><div style="display:flex;align-items:center;gap:.3rem"><span class="mono">' + esc(val) + '</span><button class="cp-btn" onclick="cp('+JSON.stringify(val)+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button></div></div>';
+}
+
+
+// ── GLOBAL SETTINGS APPLICATOR
+
+function _hexToRgb(hex) {
+  hex = hex.replace('#','');
+  if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+  var r = parseInt(hex.substring(0,2),16);
+  var g = parseInt(hex.substring(2,4),16);
+  var b = parseInt(hex.substring(4,6),16);
+  return r+','+g+','+b;
+}
+function applyGlobalSettings(s) {
+  if (!s) return;
+  if (s.primaryColor) {
+    document.documentElement.style.setProperty('--em', s.primaryColor);
+    document.documentElement.style.setProperty('--em2', s.primaryColor);
+    document.documentElement.setAttribute('data-em', s.primaryColor);
+    // Set --em-rgb for use in rgba(var(--em-rgb), opacity)
+    var _rgb = _hexToRgb(s.primaryColor);
+    document.documentElement.style.setProperty('--em-rgb', _rgb);
+  }
+  if (s.storeName) {
+    document.querySelectorAll('[data-store-name], #storeName, #ftName, .js-store-name').forEach(function(el){ el.textContent = s.storeName; });
+    if (!document.title.toLowerCase().includes('admin')) document.title = s.storeName;
+  }
+  if (s.logoUrl) {
+    document.querySelectorAll('[data-logo-img]').forEach(function(el){ el.src = s.logoUrl; el.style.display = ''; });
+    document.querySelectorAll('[data-logo-placeholder]').forEach(function(el){ el.style.display = 'none'; });
+  }
+  if (s.footerText) document.querySelectorAll('[data-footer-text]').forEach(function(el){ el.textContent = s.footerText; });
+  if (s.wa) document.querySelectorAll('[data-wa-link]').forEach(function(el){ el.href = s.wa; });
+  if (s.announcement) { var ab = document.getElementById('announcementBar'); if (ab) { ab.textContent = s.announcement; ab.style.display = ''; } }
+  applyGlobalBg(s);
+}
+function applyGlobalBg(s) {
+  var old = document.getElementById('_gbg'); if (old) old.remove();
+  if (!s || !s.bgUrl) return;
+  var op = s.bgOpacity != null ? parseFloat(s.bgOpacity) : 0.15;
+  var el = document.createElement('div');
+  el.id = '_gbg';
+  el.setAttribute('aria-hidden','true');
+  el.style.cssText = 'position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;will-change:transform;transform:translateZ(0)';
+  if (s.bgType === 'video') {
+    var v = document.createElement('video');
+    v.src = s.bgUrl; v.autoplay = true; v.loop = true; v.muted = true; v.playsInline = true;
+    v.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:'+op+';transform:translateZ(0)';
+    el.appendChild(v);
+  } else {
+    var img = document.createElement('div');
+    img.style.cssText = 'position:absolute;inset:0;background-image:url('+JSON.stringify(s.bgUrl)+');background-size:cover;background-position:center;opacity:'+op+';transform:translateZ(0)';
+    el.appendChild(img);
+  }
+  document.body.insertBefore(el, document.body.firstChild);
+}
+
+// Load global settings
+fetch('/api/products').then(function(r){return r.json();}).then(function(j){
+  if(j.settings) applyGlobalSettings(j.settings);
+}).catch(function(){});
+
+// Auto-search if ?q= param present
+var q = new URLSearchParams(location.search).get('q');
+if (q) { document.getElementById('queryInp').value = q; search(); }
+
+// Register service worker
+if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(function(){});
+
+// ── REAL-TIME: Store SSE — settings & maintenance updates
+(function connectStoreSSE() {
+  try {
+    var _src = new EventSource('/api/store/stream');
+    _src.onmessage = function(e) {
+      try {
+        var d = JSON.parse(e.data);
+        if (d.type === 'settings_update' && d.settings) {
+          applyGlobalSettings(d.settings);
+        }
+        if (d.type === 'reload') {
+          // Re-fetch settings silently
+          fetch('/api/products').then(function(r){return r.json();}).then(function(j){
+            if (j.settings) applyGlobalSettings(j.settings);
+          }).catch(function(){});
+        }
+        if (d.type === 'maintenance' && d.on) {
+          document.body.innerHTML = '<div style="position:fixed;inset:0;background:#080808;display:flex;align-items:center;justify-content:center;font-family:system-ui,sans-serif;color:#f0f0f0;font-size:.9rem;text-align:center;padding:2rem">' + (d.msg || 'Sedang dalam maintenance.') + '</div>';
+        }
+      } catch(ex){}
+    };
+    _src.onerror = function(){ _src.close(); setTimeout(connectStoreSSE, 30000); };
+  } catch(ex){}
+})();
+</script>
+</body>
+</html>
