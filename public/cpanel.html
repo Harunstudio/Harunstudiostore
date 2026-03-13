@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23080808'/%3E%3Crect width='32' height='32' rx='7' fill='none' stroke='%2334d399' stroke-width='1.5' stroke-opacity='.4'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' font-size='17' fill='%2334d399'%3ED%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>cPanel — Dongtube</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#080808;--bg1:#0c0c0c;--bg2:#121212;--bg3:#1a1a1a;--bg4:#202020;
+  --line:rgba(255,255,255,.06);--line2:rgba(255,255,255,.10);--line3:rgba(255,255,255,.18);
+  --em:#34d399;--em-rgb:52,211,153;--em2:#6ee7b7;
+  --sky:#38bdf8;--yel:#fbbf24;--red:#f87171;--pur:#a78bfa;
+  --t1:#f0f0f0;--t2:rgba(240,240,240,.55);--t3:rgba(240,240,240,.28);--t4:rgba(240,240,240,.10);
+  --font:'Instrument Sans',sans-serif;--rad:10px;--rs:7px;
+}
+html,body{min-height:100%;font-family:var(--font);background:var(--bg);color:var(--t1);font-size:13px;overscroll-behavior:none}
+
+/* ── LOADING OVERLAY ── */
+#loadOverlay{position:fixed;inset:0;background:rgba(8,8,8,.75);z-index:8888;display:none;align-items:center;justify-content:center;flex-direction:column;gap:.75rem;backdrop-filter:blur(4px)}
+#loadOverlay.on{display:flex}
+.load-bar-wrap{width:180px;height:2px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden}
+.load-bar{height:100%;background:var(--em);border-radius:2px;animation:lbSlide 1.1s ease-in-out infinite}
+@keyframes lbSlide{0%{width:0%;margin-left:0}50%{width:55%;margin-left:25%}100%{width:0%;margin-left:100%}}
+.load-txt{font-size:.68rem;color:var(--t3)}
+
+/* ── TOAST ── */
+.toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-10px);background:rgba(14,14,14,.97);border:1px solid var(--line2);color:var(--t1);padding:.6rem 1.25rem .6rem .85rem;border-radius:12px;font-size:.78rem;font-weight:600;z-index:9999;opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;word-break:break-word;box-shadow:0 12px 40px rgba(0,0,0,.8);display:flex;align-items:flex-start;gap:.5rem;backdrop-filter:blur(20px);max-width:min(400px,90vw)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{border-color:rgba(var(--em-rgb),.4);color:var(--em)}
+.toast.err{border-color:rgba(248,113,113,.35);color:var(--red)}
+.toast.info{border-color:rgba(56,189,248,.3);color:var(--sky)}
+.toast.warn{border-color:rgba(251,191,36,.3);color:var(--yel)}
+.toast-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.toast.ok .toast-icon{background:rgba(var(--em-rgb),.15)}
+.toast.err .toast-icon{background:rgba(248,113,113,.12)}
+.toast.info .toast-icon{background:rgba(56,189,248,.12)}
+.toast.warn .toast-icon{background:rgba(251,191,36,.12)}
+
+/* ── LOGIN SCREEN ── */
+#loginScreen{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;z-index:100;background:var(--bg)}
+.lc{width:340px;background:var(--bg1);border:1px solid var(--line2);border-radius:18px;padding:2rem;box-shadow:0 0 80px rgba(0,0,0,.85)}
+.lc-logo{display:flex;align-items:center;gap:.65rem;margin-bottom:1.5rem}
+.lc-gem{width:36px;height:36px;background:rgba(var(--em-rgb),.08);border:1px solid rgba(var(--em-rgb),.2);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.lc-gem svg{width:17px;height:17px}
+.lc-info{}
+.lc-name{font-size:.9rem;font-weight:700;color:var(--t1)}
+.lc-sub{font-size:.62rem;color:var(--t3);margin-top:.1rem}
+.l-field{margin-bottom:.65rem}
+.l-label{font-size:.57rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:.3rem}
+.l-inp{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:var(--rs);padding:.6rem .85rem;color:var(--t1);font-family:var(--font);font-size:.8rem;outline:none;transition:border-color .15s}
+.l-inp:focus{border-color:rgba(var(--em-rgb),.35)}
+.l-btn{width:100%;background:var(--em);color:#040d09;border:none;border-radius:var(--rs);padding:.65rem;font-family:var(--font);font-size:.78rem;font-weight:700;cursor:pointer;transition:opacity .15s;margin-top:.25rem}
+.l-btn:hover{opacity:.9}.l-btn:disabled{opacity:.4;cursor:not-allowed}
+.l-err{font-size:.65rem;color:var(--red);min-height:1.1rem;margin-top:.35rem}
+.l-hint{font-size:.63rem;color:var(--t3);margin-top:1rem;border-top:1px solid var(--line);padding-top:.75rem;line-height:1.5}
+.l-hint b{color:var(--t2)}
+
+/* ── MAIN APP ── */
+#app{display:none;flex-direction:column;min-height:100vh}
+#app.show{display:flex}
+
+/* ── TOPBAR ── */
+.topbar{height:50px;background:var(--bg1);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.6rem;padding:0 1rem;flex-shrink:0;position:sticky;top:0;z-index:50}
+.topbar-logo{display:flex;align-items:center;gap:.45rem;font-size:.82rem;font-weight:700;color:var(--em);margin-right:.5rem}
+.topbar-dot{width:7px;height:7px;border-radius:50%;background:var(--em);box-shadow:0 0 6px rgba(var(--em-rgb),.5)}
+.topbar-sep{flex:1}
+.topbar-user{font-size:.68rem;color:var(--t2);padding:.28rem .65rem;border-radius:6px;border:1px solid var(--line);background:none}
+.topbar-logout{padding:.28rem .65rem;border-radius:6px;border:1px solid var(--line);background:none;color:var(--t3);font-family:var(--font);font-size:.62rem;font-weight:600;cursor:pointer;transition:all .15s}
+.topbar-logout:hover{color:var(--t1);border-color:var(--line2)}
+.topbar-badge{font-size:.6rem;font-weight:700;background:rgba(var(--em-rgb),.12);color:var(--em);border:1px solid rgba(var(--em-rgb),.25);border-radius:6px;padding:.18rem .5rem}
+
+/* ── BODY ── */
+.body{flex:1;padding:1.25rem 1rem 3rem;max-width:900px;margin:0 auto;width:100%}
+
+/* ── QUOTA BANNER ── */
+.quota-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:.5rem;margin-bottom:1.25rem}
+.qc{background:var(--bg1);border:1px solid var(--line);border-radius:var(--rad);padding:.7rem .9rem}
+.qc-lbl{font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:.25rem}
+.qc-val{font-size:1.35rem;font-weight:700;line-height:1;color:var(--t1)}
+.qc-val.em{color:var(--em)}.qc-val.sky{color:var(--sky)}.qc-val.yel{color:var(--yel)}
+
+/* ── SECTION ── */
+.sec{background:var(--bg1);border:1px solid var(--line);border-radius:var(--rad);margin-bottom:1rem}
+.sec-head{padding:.7rem 1rem;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.sec-title{font-size:.72rem;font-weight:700}
+.sec-body{padding:1rem}
+
+/* ── FORM ── */
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:.55rem;margin-bottom:.6rem}
+.fgrid.full{grid-template-columns:1fr}
+.fwrap{display:flex;flex-direction:column}
+.flabel{font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:.28rem}
+.finp{background:var(--bg2);border:1px solid var(--line);border-radius:var(--rs);padding:.5rem .8rem;color:var(--t1);font-family:var(--font);font-size:.78rem;outline:none;transition:border-color .15s;width:100%}
+.finp:focus{border-color:rgba(var(--em-rgb),.28)}
+.finp.mono{font-family:monospace;font-size:.73rem;letter-spacing:.03em}
+.fnote{font-size:.6rem;color:var(--t4);margin-top:.22rem;line-height:1.4}
+.fnote b{color:var(--t3)}
+.submit-btn{background:var(--em);color:#040d09;border:none;border-radius:var(--rs);padding:.6rem 1.5rem;font-family:var(--font);font-size:.76rem;font-weight:700;cursor:pointer;transition:opacity .15s;min-height:36px}
+.submit-btn:hover{opacity:.88}.submit-btn:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── PLAN CARDS ── */
+.plan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.5rem;margin-bottom:.75rem}
+.plan-card{background:var(--bg2);border:1.5px solid var(--line);border-radius:10px;padding:.75rem .8rem;cursor:pointer;transition:all .15s;user-select:none}
+.plan-card:hover{border-color:var(--line2);background:var(--bg3)}
+.plan-card.sel{border-color:rgba(var(--em-rgb),.45);background:rgba(var(--em-rgb),.07)}
+.plan-name{font-size:.72rem;font-weight:700;color:var(--t2);margin-bottom:.3rem;transition:color .15s}
+.plan-card.sel .plan-name{color:var(--em)}
+.plan-spec{font-size:.6rem;color:var(--t3);line-height:1.55}
+.plan-spec span{display:block}
+.plan-no-data{font-size:.7rem;color:var(--t3);padding:.5rem 0;text-align:center}
+
+/* ── RESULT CARD (setelah berhasil buat panel) ── */
+.result-card{background:rgba(var(--em-rgb),.05);border:1px solid rgba(var(--em-rgb),.2);border-radius:12px;padding:1rem 1.1rem;margin-top:.75rem}
+.result-title{font-size:.68rem;font-weight:700;color:var(--em);margin-bottom:.7rem;text-transform:uppercase;letter-spacing:.06em}
+.result-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.55rem}
+.ri{display:flex;flex-direction:column;gap:.15rem}
+.ri-lbl{font-size:.55rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3)}
+.ri-val{font-size:.75rem;font-weight:600;color:var(--t1);word-break:break-all}
+.ri-val.mono{font-family:monospace;font-size:.7rem}
+.ri-val.em{color:var(--em)}
+.ri-copy{display:inline-flex;align-items:center;gap:.3rem;font-size:.6rem;color:var(--t3);cursor:pointer;margin-top:.1rem;transition:color .13s}
+.ri-copy:hover{color:var(--em)}
+.result-note{margin-top:.75rem;font-size:.62rem;color:var(--t3);line-height:1.5;border-top:1px solid rgba(var(--em-rgb),.12);padding-top:.6rem}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto}
+.tbl{width:100%;border-collapse:collapse;font-size:.68rem}
+.tbl th{font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--t3);padding:.5rem .75rem;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+.tbl td{padding:.55rem .75rem;border-bottom:1px solid var(--line);color:var(--t2);vertical-align:middle}
+.tbl tr:last-child td{border:none}
+.tbl tr:hover td{background:rgba(255,255,255,.02)}
+.tbl-empty{text-align:center;color:var(--t3);padding:1.5rem;font-size:.7rem}
+.sbadge{display:inline-block;font-size:.58rem;font-weight:700;padding:.15rem .45rem;border-radius:5px;line-height:1.4}
+.sbadge.active{background:rgba(var(--em-rgb),.1);color:var(--em);border:1px solid rgba(var(--em-rgb),.25)}
+.sbadge.deleted{background:rgba(248,113,113,.08);color:var(--red);border:1px solid rgba(248,113,113,.2)}
+
+/* ── COPY FEEDBACK ── */
+.copy-ok{color:var(--em)!important}
+
+/* ── SPINNER ── */
+.ld{display:inline-flex;gap:3px;align-items:center}
+.ld span{width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.3;animation:ldBlink 1.1s infinite}
+.ld span:nth-child(2){animation-delay:.18s}.ld span:nth-child(3){animation-delay:.36s}
+@keyframes ldBlink{0%,80%,100%{opacity:.3}40%{opacity:1}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .fgrid{grid-template-columns:1fr}
+  .plan-grid{grid-template-columns:repeat(auto-fill,minmax(120px,1fr))}
+  .result-grid{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<div id="loadOverlay"><div class="load-bar-wrap"><div class="load-bar"></div></div><div class="load-txt">Memuat...</div></div>
+<div class="toast" id="toast"><div class="toast-icon" id="toastIcon"></div><span id="toastMsg"></span></div>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="lc">
+    <div class="lc-logo">
+      <div class="lc-gem">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      </div>
+      <div class="lc-info">
+        <div class="lc-name">cPanel Dongtube</div>
+        <div class="lc-sub">Portal reseller — buat panel Pterodactyl</div>
+      </div>
+    </div>
+    <div class="l-field">
+      <div class="l-label">Username</div>
+      <input class="l-inp" id="loginUser" type="text" placeholder="username reseller..." autocomplete="username" autocapitalize="none" onkeydown="if(event.key==='Enter')document.getElementById('loginPass').focus()">
+    </div>
+    <div class="l-field">
+      <div class="l-label">Password</div>
+      <input class="l-inp" id="loginPass" type="password" placeholder="password..." autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="l-btn" id="loginBtn" onclick="doLogin()">Masuk</button>
+    <div class="l-err" id="loginErr"></div>
+    <div class="l-hint">Akun reseller dibuat oleh <b>admin</b>. Hubungi admin jika belum punya akun.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-logo"><div class="topbar-dot"></div>cPanel</div>
+    <span class="topbar-badge" id="topbarBadge">Reseller</span>
+    <div class="topbar-sep"></div>
+    <span class="topbar-user" id="topbarUser"></span>
+    <button class="topbar-logout" onclick="doLogout()">Keluar</button>
+  </div>
+
+  <div class="body">
+
+    <!-- Quota -->
+    <div class="quota-bar" id="quotaBar">
+      <div class="qc"><div class="qc-lbl">Username</div><div class="qc-val em" id="qUsername">—</div></div>
+      <div class="qc"><div class="qc-lbl">Server Aktif</div><div class="qc-val sky" id="qActive">—</div></div>
+      <div class="qc"><div class="qc-lbl">Maks Server</div><div class="qc-val" id="qMax">—</div></div>
+      <div class="qc"><div class="qc-lbl">Plan Tersedia</div><div class="qc-val yel" id="qPlans">—</div></div>
+    </div>
+
+    <!-- Buat Panel -->
+    <div class="sec">
+      <div class="sec-head">
+        <span class="sec-title">Buat Panel Baru</span>
+        <span id="quotaWarn" style="font-size:.6rem;color:var(--red);display:none">Kuota penuh</span>
+      </div>
+      <div class="sec-body">
+
+        <!-- Plan selector -->
+        <div style="font-size:.56rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--t3);margin-bottom:.5rem">Pilih Plan</div>
+        <div class="plan-grid" id="planGrid">
+          <div class="plan-no-data"><span class="ld"><span></span><span></span><span></span></span> Memuat plan...</div>
+        </div>
+        <div id="planSelectedInfo" style="font-size:.63rem;color:var(--t3);margin-bottom:.8rem;min-height:.9rem"></div>
+
+        <!-- Username & Password -->
+        <div class="fgrid">
+          <div class="fwrap">
+            <div class="flabel">Username Panel</div>
+            <input class="finp mono" id="panelUser" type="text" placeholder="contoh: mybotname" autocomplete="off" autocapitalize="none" maxlength="32" oninput="validatePanelUser()">
+            <div class="fnote" id="panelUserNote">3–32 karakter, huruf/angka/underscore/titik/strip</div>
+          </div>
+          <div class="fwrap">
+            <div class="flabel">Password Panel</div>
+            <div style="position:relative">
+              <input class="finp mono" id="panelPass" type="password" placeholder="min. 6 karakter" autocomplete="new-password" maxlength="64">
+              <button onclick="togglePassVis('panelPass',this)" style="position:absolute;right:.5rem;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--t3);cursor:pointer;padding:.2rem;display:flex;align-items:center" title="Tampilkan password">
+                <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="14" height="14"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <div class="fnote">Minimal 6 karakter</div>
+          </div>
+        </div>
+
+        <!-- Durasi -->
+        <div class="fgrid full">
+          <div class="fwrap">
+            <div class="flabel">Durasi (hari)</div>
+            <input class="finp" id="panelDays" type="number" value="30" min="1" max="3650" placeholder="30">
+            <div class="fnote">1 – 3650 hari. Default 30 hari.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;align-items:center;gap:.75rem;margin-top:.25rem">
+          <button class="submit-btn" id="createBtn" onclick="createPanel()">Buat Panel</button>
+          <span id="createStatus" style="font-size:.65rem;color:var(--t3)"></span>
+        </div>
+
+        <!-- Hasil -->
+        <div id="resultCard" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- Daftar Server -->
+    <div class="sec">
+      <div class="sec-head">
+        <span class="sec-title">Server Saya</span>
+        <button onclick="loadServers()" style="padding:.28rem .6rem;border-radius:6px;border:1px solid var(--line);background:none;color:var(--t3);font-family:var(--font);font-size:.62rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.color='var(--t1)'" onmouseout="this.style.color='var(--t3)'">Muat Ulang</button>
+      </div>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr>
+            <th>ID</th>
+            <th>Username Panel</th>
+            <th>Plan</th>
+            <th>RAM</th>
+            <th>Disk</th>
+            <th>CPU</th>
+            <th>Kadaluarsa</th>
+            <th>Status</th>
+            <th>Domain</th>
+          </tr></thead>
+          <tbody id="serverBody">
+            <tr><td colspan="9" class="tbl-empty"><span class="ld"><span></span><span></span><span></span></span> Memuat...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div><!-- /body -->
+</div><!-- /app -->
+
+<script>
+// ── TOKEN & STATE
+var TOKEN     = '';
+var _plans    = [];
+var _selPlan  = '';
+var _profile  = null;
+
+var TOKEN_KEY = 'cpanel_rtoken';
+
+function saveToken(t)   { TOKEN = t; try { localStorage.setItem(TOKEN_KEY, t); } catch(e) {} }
+function clearToken()   { TOKEN = ''; try { localStorage.removeItem(TOKEN_KEY); } catch(e) {} }
+function getSavedToken(){ try { return localStorage.getItem(TOKEN_KEY) || ''; } catch(e) { return ''; } }
+
+// ── FETCH HELPER
+function rFetch(method, url, data) {
+  var opts = { method: method, headers: { 'x-reseller-token': TOKEN } };
+  if (data !== undefined && data !== null) {
+    opts.headers['Content-Type'] = 'application/json';
+    opts.body = JSON.stringify(data);
+  }
+  return fetch(url, opts)
+    .then(function(r) { return r.json(); })
+    .catch(function(e) {
+      toast('Koneksi error: ' + e.message, 'err');
+      return { ok: false, message: e.message };
+    });
+}
+
+// ── TOAST
+function toast(msg, type, dur) {
+  var t  = document.getElementById('toast');
+  var ic = document.getElementById('toastIcon');
+  var ms = document.getElementById('toastMsg');
+  type = type || 'info';
+  var icons = {
+    ok:   '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" width="11" height="11"><polyline points="20 6 9 17 4 12"/></svg>',
+    err:  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" width="11" height="11"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>',
+    warn: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="11" height="11"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',
+    info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" width="11" height="11"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+  };
+  ic.innerHTML = icons[type] || icons.info;
+  ms.textContent = msg;
+  t.className = 'toast on ' + type;
+  clearTimeout(t._tid);
+  t._tid = setTimeout(function() { t.classList.remove('on'); }, dur || (type === 'err' ? 4500 : 2800));
+}
+
+function showLoad(msg) {
+  document.getElementById('loadOverlay').querySelector('.load-txt').textContent = msg || 'Memuat...';
+  document.getElementById('loadOverlay').classList.add('on');
+}
+function hideLoad() { document.getElementById('loadOverlay').classList.remove('on'); }
+
+function esc(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function fmtDate(ts){
+  if (!ts) return '—';
+  return new Date(ts).toLocaleDateString('id-ID',{day:'2-digit',month:'2-digit',year:'numeric'});
+}
+
+// ── TOGGLE PASSWORD VISIBILITY
+function togglePassVis(inputId, btn) {
+  var inp = document.getElementById(inputId);
+  if (!inp) return;
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    btn.querySelector('svg').innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>';
+  } else {
+    inp.type = 'password';
+    btn.querySelector('svg').innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+  }
+}
+
+// ── LOGIN
+async function doLogin() {
+  var username = (document.getElementById('loginUser').value || '').trim().toLowerCase();
+  var password = (document.getElementById('loginPass').value || '');
+  var err      = document.getElementById('loginErr');
+  var btn      = document.getElementById('loginBtn');
+  err.textContent = '';
+  if (!username) { err.textContent = 'Masukkan username.'; return; }
+  if (!password) { err.textContent = 'Masukkan password.'; return; }
+  btn.disabled = true; btn.textContent = 'Memverifikasi...';
+  try {
+    var j = await rFetch('POST', '/api/reseller/login', { username: username, password: password });
+    if (j.ok === true && j.token) {
+      saveToken(j.token);
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('app').classList.add('show');
+      document.getElementById('topbarUser').textContent = username;
+      loadAll();
+    } else {
+      err.textContent = j.message || 'Username atau password salah.';
+      btn.disabled = false; btn.textContent = 'Masuk';
+    }
+  } catch(e) {
+    err.textContent = 'Koneksi error.';
+    btn.disabled = false; btn.textContent = 'Masuk';
+  }
+}
+
+function doLogout() {
+  clearToken();
+  location.reload();
+}
+
+// ── AUTO-RESTORE SESSION
+async function tryAutoLogin() {
+  var t = getSavedToken();
+  if (!t) return false;
+  TOKEN = t;
+  try {
+    var j = await rFetch('GET', '/api/reseller/profile');
+    if (j.ok === true && j.data) {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('app').classList.add('show');
+      document.getElementById('topbarUser').textContent = j.data.username;
+      _profile = j.data;
+      applyProfile();
+      loadPlans();
+      loadServers();
+      return true;
+    }
+  } catch(e) {}
+  clearToken();
+  return false;
+}
+
+// ── LOAD ALL
+async function loadAll() {
+  showLoad('Memuat data...');
+  try {
+    await Promise.all([ loadProfile(), loadPlans(), loadServers() ]);
+  } catch(e) {}
+  hideLoad();
+}
+
+async function loadProfile() {
+  var j = await rFetch('GET', '/api/reseller/profile');
+  if (j.ok === true && j.data) {
+    _profile = j.data;
+    applyProfile();
+  } else if (j.ok === false) {
+    // Token expired / invalid
+    if (j.message && j.message.indexOf('Login') !== -1) {
+      clearToken(); location.reload();
+    }
+  }
+}
+
+function applyProfile() {
+  if (!_profile) return;
+  document.getElementById('qUsername').textContent = _profile.username || '—';
+  document.getElementById('qActive').textContent   = String(_profile.activeServers !== undefined ? _profile.activeServers : '—');
+  document.getElementById('qMax').textContent      = String(_profile.maxServers !== undefined ? _profile.maxServers : '—');
+  document.getElementById('qPlans').textContent    = _profile.allowedPlans && _profile.allowedPlans.length > 0
+    ? String(_profile.allowedPlans.length) + ' plan'
+    : 'Semua';
+  // Warn if full
+  var warn = document.getElementById('quotaWarn');
+  var btn  = document.getElementById('createBtn');
+  if (_profile.maxServers && _profile.activeServers >= _profile.maxServers) {
+    warn.style.display = '';
+    btn.disabled = true;
+    btn.title = 'Kuota server penuh';
+  } else {
+    warn.style.display = 'none';
+    btn.disabled = false;
+    btn.title = '';
+  }
+}
+
+// ── LOAD PLANS
+async function loadPlans() {
+  var j = await rFetch('GET', '/api/reseller/plans');
+  if (!j.ok) {
+    document.getElementById('planGrid').innerHTML = '<div class="plan-no-data">Gagal memuat plan: ' + esc(j.message) + '</div>';
+    return;
+  }
+  _plans = j.data || [];
+  if (!_plans.length) {
+    document.getElementById('planGrid').innerHTML = '<div class="plan-no-data">Tidak ada plan tersedia. Hubungi admin.</div>';
+    return;
+  }
+  renderPlans();
+}
+
+function formatMb(mb) {
+  if (mb === 0) return 'Unlimited';
+  if (mb >= 1024) return (mb / 1024).toFixed(1).replace('.0','') + ' GB';
+  return mb + ' MB';
+}
+
+function renderPlans() {
+  var html = _plans.map(function(p) {
+    var isSel = p.id === _selPlan;
+    return '<div class="plan-card' + (isSel ? ' sel' : '') + '" data-id="' + esc(p.id) + '" onclick="selectPlan(\'' + esc(p.id) + '\')">'
+      + '<div class="plan-name">' + esc(p.name || p.id.toUpperCase()) + '</div>'
+      + '<div class="plan-spec">'
+      + '<span>RAM: ' + formatMb(p.ram) + '</span>'
+      + '<span>Disk: ' + formatMb(p.disk) + '</span>'
+      + '<span>CPU: ' + (p.cpu === 0 ? 'Unlimited' : p.cpu + '%') + '</span>'
+      + '</div>'
+      + '</div>';
+  }).join('');
+  document.getElementById('planGrid').innerHTML = html;
+  updatePlanInfo();
+}
+
+function selectPlan(id) {
+  _selPlan = id;
+  document.querySelectorAll('#planGrid .plan-card').forEach(function(c) {
+    c.classList.toggle('sel', c.dataset.id === id);
+  });
+  updatePlanInfo();
+}
+
+function updatePlanInfo() {
+  var info = document.getElementById('planSelectedInfo');
+  if (!_selPlan) { info.textContent = 'Pilih plan di atas sebelum membuat panel.'; return; }
+  var p = _plans.find(function(x){ return x.id === _selPlan; });
+  if (!p) { info.textContent = ''; return; }
+  info.textContent = 'Plan dipilih: ' + (p.name || p.id.toUpperCase())
+    + ' — RAM: ' + formatMb(p.ram)
+    + ', Disk: ' + formatMb(p.disk)
+    + ', CPU: ' + (p.cpu === 0 ? 'Unlimited' : p.cpu + '%');
+}
+
+// ── VALIDATE USERNAME
+function validatePanelUser() {
+  var note = document.getElementById('panelUserNote');
+  var val  = (document.getElementById('panelUser').value || '').trim();
+  if (!val) { note.textContent = '3–32 karakter, huruf/angka/underscore/titik/strip'; note.style.color = ''; return; }
+  if (val.length < 3) { note.textContent = 'Minimal 3 karakter.'; note.style.color = 'var(--red)'; return; }
+  if (val.length > 32) { note.textContent = 'Maksimal 32 karakter.'; note.style.color = 'var(--red)'; return; }
+  if (!/^[a-zA-Z0-9_.\\-]+$/.test(val)) { note.textContent = 'Hanya huruf, angka, _, ., -'; note.style.color = 'var(--red)'; return; }
+  note.textContent = 'Username valid.'; note.style.color = 'var(--em)';
+}
+
+// ── CREATE PANEL
+async function createPanel() {
+  var username = (document.getElementById('panelUser').value || '').trim();
+  var password = (document.getElementById('panelPass').value || '').trim();
+  var days     = parseInt(document.getElementById('panelDays').value) || 30;
+  var status   = document.getElementById('createStatus');
+  var btn      = document.getElementById('createBtn');
+
+  // Client-side validation
+  if (!_selPlan) { toast('Pilih plan terlebih dahulu.', 'warn'); return; }
+  if (!username || username.length < 3) { toast('Username panel minimal 3 karakter.', 'warn'); return; }
+  if (!/^[a-zA-Z0-9_.\\-]+$/.test(username)) { toast('Username hanya boleh huruf, angka, _, ., -', 'warn'); return; }
+  if (!password || password.length < 6) { toast('Password minimal 6 karakter.', 'warn'); return; }
+  if (days < 1 || days > 3650) { toast('Durasi 1 – 3650 hari.', 'warn'); return; }
+
+  btn.disabled = true;
+  status.textContent = 'Membuat server, harap tunggu...';
+  status.style.color = 'var(--t3)';
+  document.getElementById('resultCard').style.display = 'none';
+
+  try {
+    var j = await rFetch('POST', '/api/reseller/create-panel', {
+      username : username,
+      password : password,
+      plan     : _selPlan,
+      days     : days,
+    });
+
+    if (j.ok === true && j.data) {
+      status.textContent = 'Server berhasil dibuat.';
+      status.style.color = 'var(--em)';
+      renderResult(j.data);
+      toast('Panel berhasil dibuat!', 'ok');
+      // Clear form
+      document.getElementById('panelUser').value = '';
+      document.getElementById('panelPass').value = '';
+      document.getElementById('panelDays').value = '30';
+      document.getElementById('panelUserNote').textContent = '3–32 karakter, huruf/angka/underscore/titik/strip';
+      document.getElementById('panelUserNote').style.color = '';
+      // Reload profile & server list
+      loadProfile();
+      loadServers();
+    } else {
+      status.textContent = j.message || 'Gagal membuat panel.';
+      status.style.color = 'var(--red)';
+      toast(j.message || 'Gagal membuat panel.', 'err');
+    }
+  } catch(e) {
+    status.textContent = 'Koneksi error.';
+    status.style.color = 'var(--red)';
+    toast('Koneksi error: ' + e.message, 'err');
+  }
+  btn.disabled = false;
+}
+
+function renderResult(d) {
+  var card = document.getElementById('resultCard');
+  var expStr = d.expiresAt ? fmtDate(d.expiresAt) : '—';
+  var domainClean = (d.domain || '').replace(/\/+$/, '');
+  card.innerHTML = '<div class="result-card">'
+    + '<div class="result-title">Panel Berhasil Dibuat</div>'
+    + '<div class="result-grid">'
+    + ri('Username', d.username, true, true)
+    + ri('Password', d.password, true, true)
+    + ri('Domain', domainClean, false, true)
+    + ri('Plan', d.plan ? d.plan.toUpperCase() : '—', false, false)
+    + ri('RAM', d.ram || '—', false, false)
+    + ri('Disk', d.disk || '—', false, false)
+    + ri('CPU', d.cpu || '—', false, false)
+    + ri('Durasi', d.days + ' hari', false, false)
+    + ri('Kadaluarsa', expStr, false, false)
+    + '</div>'
+    + '<div class="result-note">'
+    + 'Simpan username dan password ini. Login panel di <b>' + esc(domainClean) + '</b>.'
+    + '</div>'
+    + '</div>';
+  card.style.display = '';
+}
+
+function ri(label, val, isMono, copyable) {
+  var cls = 'ri-val' + (isMono ? ' mono' : '');
+  var copyHtml = copyable
+    ? '<div class="ri-copy" onclick="copyText(\'' + esc(val || '') + '\',this)" title="Salin">'
+        + '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" width="10" height="10"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>'
+        + ' Salin'
+      + '</div>'
+    : '';
+  return '<div class="ri"><div class="ri-lbl">' + esc(label) + '</div>'
+    + '<div class="' + cls + '">' + esc(val || '—') + '</div>'
+    + copyHtml
+    + '</div>';
+}
+
+function copyText(text, el) {
+  if (!text) return;
+  var ta = document.createElement('textarea');
+  ta.value = text; ta.style.cssText = 'position:fixed;left:-9999px;top:0';
+  document.body.appendChild(ta); ta.select();
+  try {
+    document.execCommand('copy');
+    el.classList.add('copy-ok');
+    el.querySelector('svg') && (el.querySelector('svg').style.stroke = 'var(--em)');
+    setTimeout(function(){ el.classList.remove('copy-ok'); }, 1800);
+    toast('Disalin!', 'ok', 1500);
+  } catch(e) { toast('Gagal menyalin.', 'err'); }
+  document.body.removeChild(ta);
+}
+
+// ── LOAD SERVERS
+async function loadServers() {
+  var tbody = document.getElementById('serverBody');
+  tbody.innerHTML = '<tr><td colspan="9" class="tbl-empty"><span class="ld"><span></span><span></span><span></span></span> Memuat...</td></tr>';
+  var j = await rFetch('GET', '/api/reseller/servers');
+  if (!j.ok) {
+    tbody.innerHTML = '<tr><td colspan="9" class="tbl-empty">Error: ' + esc(j.message) + '</td></tr>';
+    return;
+  }
+  var servers = j.data || [];
+  if (!servers.length) {
+    tbody.innerHTML = '<tr><td colspan="9" class="tbl-empty">Belum ada server yang dibuat.</td></tr>';
+    return;
+  }
+  tbody.innerHTML = servers.map(function(s) {
+    var exp = s.expiresAt ? fmtDate(s.expiresAt) : '—';
+    var now = Date.now();
+    var isExpired = s.expiresAt && now > s.expiresAt;
+    var badge = s.status === 'deleted'
+      ? '<span class="sbadge deleted">Dihapus</span>'
+      : isExpired
+        ? '<span class="sbadge" style="background:rgba(251,191,36,.08);color:var(--yel);border:1px solid rgba(251,191,36,.25)">Kadaluarsa</span>'
+        : '<span class="sbadge active">Aktif</span>';
+    var domainClean = (s.domain || '').replace(/\/+$/, '');
+    return '<tr>'
+      + '<td style="font-family:monospace;font-size:.6rem;color:var(--t3)">' + esc((s.id||'').slice(-12)) + '</td>'
+      + '<td style="font-weight:600;color:var(--t1)">' + esc(s.panelUsername||'—') + '</td>'
+      + '<td>' + esc((s.plan||'').toUpperCase()) + '</td>'
+      + '<td>' + esc(s.ram||'—') + '</td>'
+      + '<td>' + esc(s.disk||'—') + '</td>'
+      + '<td>' + esc(s.cpu||'—') + '</td>'
+      + '<td style="' + (isExpired ? 'color:var(--red)' : '') + '">' + esc(exp) + '</td>'
+      + '<td>' + badge + '</td>'
+      + '<td style="font-size:.6rem"><a href="' + esc(domainClean) + '" target="_blank" rel="noopener noreferrer" style="color:var(--sky);text-decoration:none">'
+        + esc(domainClean || '—') + '</a></td>'
+      + '</tr>';
+  }).join('');
+}
+
+// ── INIT
+(async function init() {
+  var restored = await tryAutoLogin();
+  if (!restored) {
+    hideLoad();
+    // Focus username on login screen
+    setTimeout(function(){ document.getElementById('loginUser').focus(); }, 100);
+  }
+})();
+</script>
+</body>
+</html>
