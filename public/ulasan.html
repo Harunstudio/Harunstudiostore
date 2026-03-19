@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%23080808'/%3E%3Crect width='32' height='32' rx='7' fill='none' stroke='%2334d399' stroke-width='1.5' stroke-opacity='.4'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='central' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' font-size='17' fill='%2334d399'%3ED%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='36' fill='%23080808'/%3E%3Ctext x='90' y='90' dominant-baseline='central' text-anchor='middle' font-family='system-ui,sans-serif' font-weight='700' font-size='100' fill='%2334d399'%3ED%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#0c0c0e">
+<meta name="description" content="Ulasan & Rating Pelanggan — Dongtube">
+<link rel="manifest" href="/manifest.json">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Ulasan Pelanggan — Dongtube</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0c0c0e;--bg1:#0f0f16;--bg2:#14141c;--bg3:#1a1a24;--bg4:#20202c;
+  --line:rgba(255,255,255,.06);--line2:rgba(255,255,255,.11);--line3:rgba(255,255,255,.2);
+  --em:#34d399;--em2:#6ee7b7;--em-rgb:52,211,153;
+  --sky:#38bdf8;--sky-rgb:56,189,248;
+  --yel:#fbbf24;--yel-rgb:251,191,36;
+  --red:#f87171;--red-rgb:248,113,113;
+  --pur:#a78bfa;--pur-rgb:167,139,250;
+  --t1:#f0f0f5;--t2:rgba(240,240,245,.55);--t3:rgba(240,240,245,.28);--t4:rgba(240,240,245,.1);
+  --font:'Instrument Sans',sans-serif;
+  --rad:14px;--rs:10px;
+  --trans:.18s cubic-bezier(.4,0,.2,1);
+}
+html{scroll-behavior:smooth}
+html,body{min-height:100vh;background:var(--bg);color:var(--t1);font-family:var(--font);font-size:13.5px;overflow-x:hidden}
+body{
+  background-color:#0c0c0e;
+  background-image:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);
+  background-size:45px 45px;
+}
+
+/* ── PROGRESS BAR ── */
+#topBar{position:fixed;top:0;left:0;height:2px;background:linear-gradient(90deg,var(--em),var(--sky),var(--em));background-size:200%;z-index:9998;width:0;transition:width .3s;pointer-events:none;display:none}
+#topBar.on{display:block;width:75%;animation:barPulse 1.4s ease-in-out infinite}
+@keyframes barPulse{0%,100%{background-position:0%}50%{background-position:100%}}
+
+/* ── TOAST ── */
+.toast{position:fixed;top:1rem;left:50%;transform:translateX(-50%) translateY(-16px);display:flex;align-items:center;gap:.55rem;padding:.7rem 1.2rem .7rem .8rem;border-radius:50px;font-size:.8rem;font-weight:700;z-index:9999;opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;white-space:nowrap;max-width:92vw;backdrop-filter:blur(24px);box-shadow:0 20px 60px rgba(0,0,0,.9)}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.ok{background:rgba(10,10,15,.97);border:1.5px solid rgba(var(--em-rgb),.5);color:var(--em)}
+.toast.err{background:rgba(10,10,15,.97);border:1.5px solid rgba(var(--red-rgb),.5);color:var(--red)}
+.toast.warn{background:rgba(10,10,15,.97);border:1.5px solid rgba(var(--yel-rgb),.4);color:var(--yel)}
+.t-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.toast.ok .t-icon{background:rgba(var(--em-rgb),.18)}
+.toast.err .t-icon{background:rgba(var(--red-rgb),.18)}
+.toast.warn .t-icon{background:rgba(var(--yel-rgb),.15)}
+
+/* ── NAV ── */
+.nav{height:54px;background:rgba(10,10,15,.85);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:.6rem;padding:0 1.1rem;position:sticky;top:0;z-index:50}
+.nav-logo{font-size:.82rem;font-weight:700;color:var(--em);display:flex;align-items:center;gap:.45rem;text-decoration:none}
+.nav-gem{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,rgba(var(--em-rgb),.15),rgba(0,100,200,.15));border:1px solid rgba(var(--em-rgb),.3);display:flex;align-items:center;justify-content:center;box-shadow:0 0 14px rgba(var(--em-rgb),.15)}
+.nav-gem svg{width:12px;height:12px}
+.nav-r{display:flex;align-items:center;gap:.4rem;margin-left:auto}
+.nav-btn{font-size:.65rem;font-weight:600;color:var(--t3);background:none;border:1px solid var(--line);border-radius:50px;padding:.28rem .65rem;cursor:pointer;font-family:var(--font);transition:all var(--trans);white-space:nowrap;text-decoration:none;display:inline-flex;align-items:center;gap:.3rem}
+.nav-btn:hover{color:var(--t1);border-color:var(--line2)}
+.nav-btn.em{color:var(--em);border-color:rgba(var(--em-rgb),.3);background:rgba(var(--em-rgb),.07)}
+.nav-btn.em:hover{background:rgba(var(--em-rgb),.13)}
+
+/* ── WRAP ── */
+.wrap{max-width:900px;margin:0 auto;padding:1.5rem 1rem 5rem;position:relative;z-index:1}
+
+/* ── HERO STATS CARD ── */
+.stats-hero{background:linear-gradient(135deg,rgba(var(--em-rgb),.06) 0%,rgba(var(--sky-rgb),.04) 100%);border:1px solid rgba(var(--em-rgb),.15);border-radius:20px;padding:1.6rem;margin-bottom:1.75rem;animation:slideUp .4s ease both}
+.stats-main{display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;margin-bottom:1.2rem}
+.stats-score{text-align:center;flex-shrink:0}
+.stats-num{font-family:'Instrument Serif',serif;font-size:3.5rem;font-weight:400;color:var(--em);line-height:1;letter-spacing:-.04em}
+.stats-stars-big{display:flex;gap:2px;justify-content:center;margin:.25rem 0}
+.stats-total{font-size:.62rem;color:var(--t3);font-weight:600}
+.stats-bars{flex:1;min-width:160px}
+.bar-row{display:flex;align-items:center;gap:.5rem;margin-bottom:.3rem}
+.bar-lbl{font-size:.6rem;font-weight:700;color:var(--t3);width:28px;text-align:right;flex-shrink:0}
+.bar-track{flex:1;height:5px;background:rgba(255,255,255,.06);border-radius:50px;overflow:hidden}
+.bar-fill{height:100%;border-radius:50px;transition:width .8s cubic-bezier(.4,0,.2,1)}
+.bar-fill.s5{background:var(--em)}
+.bar-fill.s4{background:#84cc16}
+.bar-fill.s3{background:var(--yel)}
+.bar-fill.s2{background:#fb923c}
+.bar-fill.s1{background:var(--red)}
+.bar-cnt{font-size:.58rem;color:var(--t3);width:20px;flex-shrink:0}
+.stats-tags{display:flex;gap:.4rem;flex-wrap:wrap}
+.stat-tag{display:inline-flex;align-items:center;gap:.28rem;font-size:.62rem;font-weight:600;padding:.22rem .6rem;border-radius:50px;border:1px solid var(--line);color:var(--t3);cursor:pointer;transition:all var(--trans)}
+.stat-tag:hover,.stat-tag.on{border-color:rgba(var(--em-rgb),.35);color:var(--em);background:rgba(var(--em-rgb),.08)}
+.stat-tag .cnt{font-size:.58rem;color:var(--t4)}
+.stat-tag.on .cnt{color:rgba(var(--em-rgb),.6)}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;align-items:center;gap:.5rem;margin-bottom:1.1rem;flex-wrap:wrap}
+.tb-left{display:flex;gap:.3rem;flex-wrap:wrap;flex:1}
+.sort-btn{font-size:.63rem;font-weight:700;padding:.3rem .7rem;border-radius:50px;border:1px solid var(--line);background:var(--bg2);color:var(--t3);cursor:pointer;font-family:var(--font);transition:all var(--trans)}
+.sort-btn:hover:not(.on){color:var(--t2);border-color:var(--line2)}
+.sort-btn.on{border-color:rgba(var(--em-rgb),.35);background:rgba(var(--em-rgb),.1);color:var(--em)}
+.write-btn{font-size:.68rem;font-weight:700;padding:.4rem 1rem;border-radius:50px;border:none;background:linear-gradient(135deg,var(--em),#22c55e);color:#04110a;cursor:pointer;font-family:var(--font);transition:all var(--trans);display:flex;align-items:center;gap:.3rem;flex-shrink:0;box-shadow:0 4px 16px rgba(var(--em-rgb),.25)}
+.write-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(var(--em-rgb),.35)}
+
+/* ── REVIEW CARDS ── */
+.reviews-list{display:flex;flex-direction:column;gap:.75rem}
+.rv-card{background:var(--bg1);border:1px solid var(--line);border-radius:var(--rad);padding:1.1rem;transition:border-color var(--trans);animation:fadeUp .3s ease both}
+.rv-card:hover{border-color:var(--line2)}
+.rv-head{display:flex;align-items:flex-start;gap:.75rem;margin-bottom:.65rem}
+.rv-avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,rgba(var(--em-rgb),.15),rgba(var(--sky-rgb),.15));border:1.5px solid rgba(var(--em-rgb),.2);display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:800;color:var(--em);flex-shrink:0;text-transform:uppercase}
+.rv-meta{flex:1;min-width:0}
+.rv-name{font-size:.78rem;font-weight:700;color:var(--t1);margin-bottom:.15rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rv-date{font-size:.6rem;color:var(--t3)}
+.rv-stars{display:flex;gap:2px;margin-bottom:.1rem}
+.star{font-size:.8rem;line-height:1}
+.rv-badge{display:inline-flex;align-items:center;gap:.2rem;font-size:.55rem;font-weight:700;padding:.12rem .45rem;border-radius:50px;margin-left:.35rem;vertical-align:middle}
+.rv-badge.verified{background:rgba(var(--em-rgb),.1);border:1px solid rgba(var(--em-rgb),.25);color:var(--em)}
+.rv-text{font-size:.76rem;color:var(--t2);line-height:1.65;margin-bottom:.65rem;word-break:break-word}
+.rv-photo{width:100%;max-width:280px;border-radius:10px;border:1px solid var(--line);cursor:zoom-in;transition:transform var(--trans);object-fit:cover;display:block;margin-bottom:.65rem;max-height:200px}
+.rv-photo:hover{transform:scale(1.01);border-color:var(--line2)}
+.rv-foot{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.4rem}
+.helpful-btn{display:inline-flex;align-items:center;gap:.3rem;font-size:.6rem;font-weight:600;color:var(--t3);background:none;border:1px solid var(--line);border-radius:50px;padding:.22rem .6rem;cursor:pointer;font-family:var(--font);transition:all var(--trans)}
+.helpful-btn:hover:not(.voted){color:var(--t2);border-color:var(--line2)}
+.helpful-btn.voted{color:var(--em);border-color:rgba(var(--em-rgb),.25);background:rgba(var(--em-rgb),.06)}
+.rv-del-btn{font-size:.58rem;color:var(--t4);background:none;border:none;cursor:pointer;padding:.2rem .4rem;border-radius:6px;font-family:var(--font);transition:all var(--trans)}
+.rv-del-btn:hover{color:var(--red);background:rgba(var(--red-rgb),.08)}
+
+/* ── STAR SELECTOR ── */
+.star-sel{display:flex;gap:.3rem;justify-content:center;margin:.5rem 0 1rem}
+.star-sel span{font-size:1.8rem;cursor:pointer;line-height:1;transition:transform .15s;user-select:none}
+.star-sel span:hover{transform:scale(1.25)}
+
+/* ── MODAL ── */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:200;display:flex;align-items:flex-end;justify-content:center;padding:0;backdrop-filter:blur(8px);animation:bgIn .2s ease}
+.modal-bg.hide{display:none}
+@keyframes bgIn{from{opacity:0}to{opacity:1}}
+.modal{width:100%;max-width:480px;background:var(--bg1);border:1px solid var(--line2);border-radius:22px 22px 0 0;padding:1.5rem 1.4rem 2.5rem;box-shadow:0 -20px 80px rgba(0,0,0,.9);animation:modalUp .3s cubic-bezier(.34,1.2,.64,1)}
+@keyframes modalUp{from{transform:translateY(100%)}to{transform:none}}
+.modal-handle{width:36px;height:4px;border-radius:2px;background:rgba(255,255,255,.12);margin:0 auto .9rem}
+.modal-title{font-size:.95rem;font-weight:700;text-align:center;margin-bottom:.3rem}
+.modal-sub{font-size:.7rem;color:var(--t3);text-align:center;margin-bottom:1.1rem}
+.f-label{font-size:.57rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);display:block;margin-bottom:.3rem}
+.f-inp{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:var(--rs);padding:.6rem .85rem;color:var(--t1);font-family:var(--font);font-size:.8rem;outline:none;transition:border-color var(--trans),box-shadow var(--trans)}
+.f-inp:focus{border-color:rgba(var(--em-rgb),.35);box-shadow:0 0 0 3px rgba(var(--em-rgb),.08)}
+.f-inp::placeholder{color:var(--t4)}
+textarea.f-inp{resize:vertical;min-height:90px;line-height:1.55}
+.mb{margin-bottom:.65rem}
+.btn-em{width:100%;font-family:var(--font);font-size:.78rem;font-weight:700;padding:.72rem;border-radius:var(--rs);border:none;cursor:pointer;transition:all var(--trans);background:linear-gradient(135deg,var(--em),#22c55e);color:#04110a;box-shadow:0 4px 20px rgba(var(--em-rgb),.25);display:flex;align-items:center;justify-content:center;gap:.4rem}
+.btn-em:hover:not(:disabled){box-shadow:0 6px 28px rgba(var(--em-rgb),.35);transform:translateY(-1px)}
+.btn-em:disabled{opacity:.35;cursor:not-allowed;transform:none;box-shadow:none}
+.btn-ghost{width:100%;font-family:var(--font);font-size:.75rem;font-weight:600;padding:.62rem;border-radius:var(--rs);border:1px solid var(--line2);background:var(--bg2);color:var(--t2);cursor:pointer;transition:all var(--trans)}
+.btn-ghost:hover{border-color:var(--line3);background:var(--bg3)}
+.err-box{background:rgba(var(--red-rgb),.07);border:1px solid rgba(var(--red-rgb),.2);border-radius:var(--rs);padding:.5rem .75rem;font-size:.7rem;color:var(--red);margin-bottom:.65rem;display:none}
+.err-box.show{display:block}
+
+/* ── PHOTO UPLOAD ── */
+.photo-drop{border:2px dashed var(--line2);border-radius:var(--rs);padding:.9rem;text-align:center;cursor:pointer;transition:all var(--trans);position:relative;overflow:hidden}
+.photo-drop:hover{border-color:rgba(var(--em-rgb),.3);background:rgba(var(--em-rgb),.03)}
+.photo-drop.has{border-color:rgba(var(--em-rgb),.4);background:rgba(var(--em-rgb),.05)}
+.photo-drop input{position:absolute;inset:0;opacity:0;cursor:pointer;font-size:100px}
+.photo-pre{width:100%;max-height:140px;object-fit:contain;border-radius:8px;display:none;margin:0 auto}
+.photo-pre.show{display:block}
+.photo-hint{font-size:.65rem;color:var(--t3);display:flex;align-items:center;justify-content:center;gap:.3rem}
+.photo-hint.hide{display:none}
+
+/* ── LIGHTBOX ── */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:500;display:none;align-items:center;justify-content:center;padding:1rem}
+.lightbox.on{display:flex}
+.lightbox img{max-width:100%;max-height:90vh;border-radius:12px;object-fit:contain}
+.lb-close{position:fixed;top:1.2rem;right:1.2rem;width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.1);border:none;color:var(--t1);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;z-index:501;transition:background .15s}
+.lb-close:hover{background:rgba(255,255,255,.2)}
+
+/* ── AUTH MODAL ── */
+.auth-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:300;display:none;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(8px)}
+.auth-modal-bg.on{display:flex}
+.auth-modal{width:100%;max-width:360px;background:var(--bg1);border:1px solid var(--line2);border-radius:20px;padding:1.6rem;box-shadow:0 0 80px rgba(0,0,0,.9);animation:modalIn .25s cubic-bezier(.34,1.56,.64,1)}
+@keyframes modalIn{from{opacity:0;transform:scale(.94) translateY(12px)}to{opacity:1;transform:none}}
+.modal-tabs{display:flex;gap:.3rem;margin-bottom:1.1rem;background:var(--bg2);border-radius:10px;padding:.25rem}
+.modal-tab{flex:1;padding:.38rem;border:none;border-radius:8px;background:none;font-family:var(--font);font-size:.7rem;font-weight:600;color:var(--t3);cursor:pointer;transition:all var(--trans)}
+.modal-tab.on{background:var(--bg3);color:var(--t1)}
+
+/* ── EMPTY / LOADING ── */
+.empty-state{text-align:center;padding:3.5rem 1rem;color:var(--t3)}
+.empty-icon{font-size:2.5rem;margin-bottom:.75rem;opacity:.4}
+.empty-title{font-size:.85rem;font-weight:700;color:var(--t2);margin-bottom:.3rem}
+.empty-sub{font-size:.7rem;line-height:1.6}
+.skeleton{background:linear-gradient(90deg,var(--bg2) 25%,var(--bg3) 50%,var(--bg2) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:8px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.skel-card{height:120px;border-radius:var(--rad);margin-bottom:.75rem}
+
+/* ── PAGINATION ── */
+.pager{display:flex;align-items:center;justify-content:center;gap:.4rem;margin-top:1.4rem}
+.page-btn{font-size:.65rem;font-weight:700;padding:.3rem .7rem;border-radius:50px;border:1px solid var(--line);background:var(--bg2);color:var(--t3);cursor:pointer;font-family:var(--font);transition:all var(--trans)}
+.page-btn:hover:not(:disabled):not(.on){color:var(--t1);border-color:var(--line2)}
+.page-btn.on{border-color:rgba(var(--em-rgb),.35);background:rgba(var(--em-rgb),.1);color:var(--em)}
+.page-btn:disabled{opacity:.3;cursor:not-allowed}
+.page-info{font-size:.62rem;color:var(--t3);margin:0 .3rem}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.spin{animation:spin .7s linear infinite;display:inline-block;line-height:1}
+
+/* ── RESPONSIVE ── */
+@media(max-width:560px){
+  .stats-main{gap:.9rem}
+  .stats-num{font-size:2.8rem}
+  .wrap{padding:1.2rem .75rem 5rem}
+  .modal{border-radius:18px 18px 0 0;padding:1.3rem 1.1rem 2.5rem}
+}
+</style>
+</head>
+<body>
+<div id="topBar"></div>
+<div class="toast" id="toast"><div class="t-icon" id="tIcon"></div><span id="tMsg"></span></div>
+
+<!-- ── LIGHTBOX ── -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lb-close" onclick="closeLightbox()">✕</button>
+  <img id="lbImg" src="" alt="">
+</div>
+
+<!-- ── AUTH MODAL ── -->
+<div class="auth-modal-bg" id="authBg">
+  <div class="auth-modal">
+    <div style="display:flex;align-items:center;gap:.55rem;margin-bottom:1rem">
+      <div style="width:32px;height:32px;background:linear-gradient(135deg,rgba(52,211,153,.12),rgba(0,100,200,.12));border:1px solid rgba(52,211,153,.25);border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      </div>
+      <div>
+        <div style="font-size:.82rem;font-weight:700">Login untuk Ulasan</div>
+        <div style="font-size:.62rem;color:var(--t3)">Gunakan akun Dongtube kamu</div>
+      </div>
+    </div>
+    <div class="modal-tabs">
+      <button class="modal-tab on" id="tabLogin" onclick="switchAuthTab('login')">Masuk</button>
+      <button class="modal-tab" id="tabReg" onclick="switchAuthTab('register')">Daftar</button>
+    </div>
+    <div id="formLogin">
+      <div class="mb"><label class="f-label">Username</label><input class="f-inp" id="loginUser" placeholder="username..." maxlength="20" autocomplete="username" oninput="this.value=this.value.replace(/[^a-z0-9_]/gi,'').toLowerCase()" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="mb"><label class="f-label">Password</label><input class="f-inp" type="password" id="loginPass" placeholder="password..." autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <div class="err-box" id="loginErr"></div>
+      <button class="btn-em" id="loginBtn" onclick="doLogin()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Masuk
+      </button>
+    </div>
+    <div id="formReg" style="display:none">
+      <div class="mb"><label class="f-label">Username <span style="color:var(--t4)">(3–20 karakter)</span></label><input class="f-inp" id="regUser" placeholder="username..." maxlength="20" autocomplete="username" oninput="this.value=this.value.replace(/[^a-z0-9_]/gi,'').toLowerCase()"></div>
+      <div class="mb"><label class="f-label">Password <span style="color:var(--t4)">(min 6 karakter)</span></label><input class="f-inp" type="password" id="regPass" placeholder="password..." autocomplete="new-password"></div>
+      <div class="mb"><label class="f-label">Email <span style="color:var(--t4)">(opsional)</span></label><input class="f-inp" type="email" id="regEmail" placeholder="email@..." autocomplete="email"></div>
+      <div class="err-box" id="regErr"></div>
+      <button class="btn-em" id="regBtn" onclick="doRegister()">Buat Akun</button>
+    </div>
+    <button class="btn-ghost" style="margin-top:.6rem" onclick="closeAuthModal()">Batal</button>
+  </div>
+</div>
+
+<!-- ── WRITE REVIEW MODAL ── -->
+<div class="modal-bg hide" id="writeBg">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">✍️ Tulis Ulasan</div>
+    <div class="modal-sub">Bagikan pengalamanmu kepada pembeli lainnya</div>
+
+    <div class="mb" style="text-align:center">
+      <label class="f-label" style="text-align:center;display:block;margin-bottom:.5rem">Bintang Rating</label>
+      <div class="star-sel" id="starSel">
+        <span data-v="1" onclick="selectStar(1)">⭐</span>
+        <span data-v="2" onclick="selectStar(2)">⭐</span>
+        <span data-v="3" onclick="selectStar(3)">⭐</span>
+        <span data-v="4" onclick="selectStar(4)">⭐</span>
+        <span data-v="5" onclick="selectStar(5)">⭐</span>
+      </div>
+      <div id="starLabel" style="font-size:.65rem;color:var(--t3);height:1rem">Pilih bintang</div>
+    </div>
+
+    <div class="mb">
+      <label class="f-label">Nama Tampilan</label>
+      <input class="f-inp" id="revName" placeholder="Nama kamu..." maxlength="50">
+      <div style="font-size:.58rem;color:var(--t3);margin-top:.25rem">Nama jorok/kasar akan otomatis ditolak</div>
+    </div>
+
+    <div class="mb">
+      <label class="f-label">Ulasan</label>
+      <textarea class="f-inp" id="revText" placeholder="Ceritakan pengalamanmu berbelanja di sini..." maxlength="1000" rows="4"></textarea>
+      <div style="font-size:.58rem;color:var(--t3);margin-top:.2rem">Kata kasar akan otomatis disensor ⭐</div>
+    </div>
+
+    <div class="mb">
+      <label class="f-label">Foto (Opsional)</label>
+      <div class="photo-drop" id="photoDrop">
+        <input type="file" id="photoFile" accept="image/jpeg,image/png,image/webp,image/gif" onchange="handlePhotoSelect(this)">
+        <div class="photo-hint" id="photoHint">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          Klik untuk pilih foto
+        </div>
+        <img class="photo-pre" id="photoPre" src="" alt="">
+      </div>
+      <div id="photoStatus" style="font-size:.6rem;color:var(--t3);margin-top:.3rem;display:none"></div>
+    </div>
+
+    <div class="err-box" id="revErr"></div>
+    <button class="btn-em" id="revSubmitBtn" onclick="submitReview()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      Kirim Ulasan
+    </button>
+    <button class="btn-ghost" style="margin-top:.5rem" onclick="closeWriteModal()">Batal</button>
+  </div>
+</div>
+
+<!-- ── NAV ── -->
+<nav class="nav">
+  <a href="/" class="nav-logo">
+    <div class="nav-gem">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#34d399" stroke-width="2" stroke-linecap="round"><polygon points="12 2 22 8.5 22 15.5 12 22 2 15.5 2 8.5"/><line x1="12" y1="2" x2="12" y2="22"/><line x1="2" y1="8.5" x2="22" y2="8.5"/></svg>
+    </div>
+    Dongtube
+  </a>
+  <div class="nav-r">
+    <a href="/" class="nav-btn">← Toko</a>
+    <a href="/chat" class="nav-btn">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      Chat
+    </a>
+    <div id="navUser" style="display:none">
+      <button class="nav-btn em" id="navLogout" onclick="doLogout()">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        <span id="navUsername"></span>
+      </button>
+    </div>
+    <button class="nav-btn" id="navLoginBtn" onclick="openAuthModal()" style="display:none">Login</button>
+  </div>
+</nav>
+
+<!-- ── MAIN ── -->
+<div class="wrap">
+  <!-- HERO STATS -->
+  <div class="stats-hero" id="statsHero">
+    <div style="font-size:.6rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--em);margin-bottom:.9rem;display:flex;align-items:center;gap:.4rem">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      Rating Keseluruhan
+    </div>
+    <div class="stats-main">
+      <div class="stats-score">
+        <div class="stats-num" id="avgNum">—</div>
+        <div class="stats-stars-big" id="avgStars"></div>
+        <div class="stats-total" id="totalTxt">Memuat...</div>
+      </div>
+      <div class="stats-bars" id="statsBars">
+        <div class="bar-row"><div class="bar-lbl">5★</div><div class="bar-track"><div class="bar-fill s5" id="b5" style="width:0"></div></div><div class="bar-cnt" id="c5">0</div></div>
+        <div class="bar-row"><div class="bar-lbl">4★</div><div class="bar-track"><div class="bar-fill s4" id="b4" style="width:0"></div></div><div class="bar-cnt" id="c4">0</div></div>
+        <div class="bar-row"><div class="bar-lbl">3★</div><div class="bar-track"><div class="bar-fill s3" id="b3" style="width:0"></div></div><div class="bar-cnt" id="c3">0</div></div>
+        <div class="bar-row"><div class="bar-lbl">2★</div><div class="bar-track"><div class="bar-fill s2" id="b2" style="width:0"></div></div><div class="bar-cnt" id="c2">0</div></div>
+        <div class="bar-row"><div class="bar-lbl">1★</div><div class="bar-track"><div class="bar-fill s1" id="b1" style="width:0"></div></div><div class="bar-cnt" id="c1">0</div></div>
+      </div>
+    </div>
+    <div class="stats-tags" id="statsTags">
+      <button class="stat-tag on" data-star="0" onclick="filterByStar(0)">Semua <span class="cnt" id="tagAll">0</span></button>
+      <button class="stat-tag" data-star="5" onclick="filterByStar(5)">⭐⭐⭐⭐⭐ <span class="cnt" id="tag5">0</span></button>
+      <button class="stat-tag" data-star="4" onclick="filterByStar(4)">⭐⭐⭐⭐ <span class="cnt" id="tag4">0</span></button>
+      <button class="stat-tag" data-star="3" onclick="filterByStar(3)">⭐⭐⭐ <span class="cnt" id="tag3">0</span></button>
+      <button class="stat-tag" data-star="2" onclick="filterByStar(2)">⭐⭐ <span class="cnt" id="tag2">0</span></button>
+      <button class="stat-tag" data-star="1" onclick="filterByStar(1)">⭐ <span class="cnt" id="tag1">0</span></button>
+      <button class="stat-tag" data-photo="1" onclick="filterPhoto()">📷 Pakai Foto <span class="cnt" id="tagPhoto">0</span></button>
+    </div>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <div class="tb-left">
+      <button class="sort-btn on" data-sort="newest" onclick="setSort('newest')">Terbaru</button>
+      <button class="sort-btn" data-sort="highest" onclick="setSort('highest')">Bintang ↑</button>
+      <button class="sort-btn" data-sort="lowest" onclick="setSort('lowest')">Bintang ↓</button>
+      <button class="sort-btn" data-sort="oldest" onclick="setSort('oldest')">Terlama</button>
+    </div>
+    <button class="write-btn" onclick="openWriteModal()">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+      Tulis Ulasan
+    </button>
+  </div>
+
+  <!-- REVIEWS LIST -->
+  <div id="reviewsWrap">
+    <div class="skel-card skeleton"></div>
+    <div class="skel-card skeleton"></div>
+    <div class="skel-card skeleton"></div>
+  </div>
+
+  <!-- PAGINATION -->
+  <div class="pager" id="pager" style="display:none"></div>
+</div>
+
+<script>
+// ── STATE
+let _token = localStorage.getItem('userToken') || '';
+let _username = localStorage.getItem('username') || '';
+let _curStar = 0, _curSort = 'newest', _curPage = 1, _photoOnly = false;
+let _uploading = false, _selectedStar = 0;
+let _helpedIds = new Set(JSON.parse(localStorage.getItem('helpedRevIds')||'[]'));
+let _adminToken = localStorage.getItem('adminToken') || '';
+
+// ── TOAST
+let _tTimer;
+function toast(msg,type='ok',dur=3000){
+  const el=document.getElementById('toast'),ti=document.getElementById('tIcon'),tm=document.getElementById('tMsg');
+  const ico={ok:'✓',err:'✕',warn:'!',info:'i'};
+  el.className='toast '+type; ti.textContent=ico[type]||'•'; tm.textContent=msg;
+  el.classList.add('on'); clearTimeout(_tTimer);
+  if(dur>0) _tTimer=setTimeout(()=>el.classList.remove('on'),dur);
+}
+function bar(on){const b=document.getElementById('topBar');b.className=on?'on':'';if(!on)b.style.width='0'}
+
+// ── AUTH
+function initAuth(){
+  if(_token && _username){
+    document.getElementById('navUser').style.display='';
+    document.getElementById('navUsername').textContent=_username;
+    document.getElementById('navLoginBtn').style.display='none';
+  } else {
+    document.getElementById('navUser').style.display='none';
+    document.getElementById('navLoginBtn').style.display='';
+  }
+}
+function openAuthModal(){document.getElementById('authBg').classList.add('on')}
+function closeAuthModal(){document.getElementById('authBg').classList.remove('on')}
+function switchAuthTab(t){
+  document.getElementById('formLogin').style.display=t==='login'?'':'none';
+  document.getElementById('formReg').style.display=t==='register'?'':'none';
+  document.getElementById('tabLogin').className='modal-tab'+(t==='login'?' on':'');
+  document.getElementById('tabReg').className='modal-tab'+(t==='register'?' on':'');
+}
+async function doLogin(){
+  const u=document.getElementById('loginUser').value.trim();
+  const p=document.getElementById('loginPass').value;
+  const err=document.getElementById('loginErr');
+  if(!u||!p){err.textContent='Isi semua field.';err.classList.add('show');return}
+  const btn=document.getElementById('loginBtn');
+  btn.disabled=true;btn.textContent='⏳ Memuat...';err.classList.remove('show');
+  try{
+    const r=await fetch('/api/user/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p})});
+    const j=await r.json();
+    if(!j.ok){err.textContent=j.message||'Login gagal.';err.classList.add('show');return}
+    _token=j.token;_username=j.username;
+    localStorage.setItem('userToken',_token);localStorage.setItem('username',_username);
+    closeAuthModal();initAuth();toast('Berhasil login!','ok');
+    // Jika ada write modal pending, buka
+    if(window._pendingWrite){window._pendingWrite=false;openWriteModal();}
+  }catch(e){err.textContent='Error: '+e.message;err.classList.add('show');}
+  finally{btn.disabled=false;btn.textContent='Masuk';}
+}
+async function doRegister(){
+  const u=document.getElementById('regUser').value.trim();
+  const p=document.getElementById('regPass').value;
+  const e2=document.getElementById('regEmail').value.trim();
+  const err=document.getElementById('regErr');
+  if(!u||!p){err.textContent='Isi username dan password.';err.classList.add('show');return}
+  if(u.length<3){err.textContent='Username min 3 karakter.';err.classList.add('show');return}
+  if(p.length<6){err.textContent='Password min 6 karakter.';err.classList.add('show');return}
+  const btn=document.getElementById('regBtn');
+  btn.disabled=true;btn.textContent='⏳ Membuat akun...';err.classList.remove('show');
+  try{
+    const r=await fetch('/api/user/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:u,password:p,email:e2})});
+    const j=await r.json();
+    if(!j.ok){err.textContent=j.message||'Gagal.';err.classList.add('show');return}
+    toast('Akun berhasil dibuat! Silakan login.','ok',4000);
+    switchAuthTab('login');
+    document.getElementById('loginUser').value=u;
+  }catch(e){err.textContent='Error: '+e.message;err.classList.add('show');}
+  finally{btn.disabled=false;btn.textContent='Buat Akun';}
+}
+function doLogout(){
+  _token='';_username='';
+  localStorage.removeItem('userToken');localStorage.removeItem('username');
+  initAuth();toast('Berhasil logout.','ok');
+}
+
+// ── STARS
+const STAR_LABELS=['','Sangat Buruk 😞','Buruk 😕','Cukup 😐','Bagus 😊','Luar Biasa 🤩'];
+function selectStar(v){
+  _selectedStar=v;
+  const spans=document.querySelectorAll('#starSel span');
+  spans.forEach((s,i)=>{s.style.opacity=i<v?'1':'.25';s.style.filter=i<v?'':'grayscale(1)';});
+  document.getElementById('starLabel').textContent=STAR_LABELS[v]||'';
+  document.getElementById('starLabel').style.color='var(--yel)';
+}
+function renderStars(n,size='.8rem'){
+  const full=Math.floor(n),half=(n-full)>=0.5;
+  let h='';
+  for(let i=0;i<5;i++){
+    if(i<full) h+=`<span class="star" style="font-size:${size}">⭐</span>`;
+    else if(i===full&&half) h+=`<span class="star" style="font-size:${size};filter:grayscale(.5)">⭐</span>`;
+    else h+=`<span class="star" style="font-size:${size};filter:grayscale(1);opacity:.25">⭐</span>`;
+  }
+  return h;
+}
+
+// ── PHOTO SELECT
+async function handlePhotoSelect(inp){
+  const file=inp.files[0];
+  if(!file) return;
+  if(file.size>8*1024*1024){toast('Foto max 8MB','err');return}
+  const pre=document.getElementById('photoPre');
+  const hint=document.getElementById('photoHint');
+  const drop=document.getElementById('photoDrop');
+  const st=document.getElementById('photoStatus');
+
+  // Preview
+  const reader=new FileReader();
+  reader.onload=e=>{pre.src=e.target.result;pre.classList.add('show');hint.classList.add('hide');drop.classList.add('has');}
+  reader.readAsDataURL(file);
+
+  // Upload ke CDN
+  st.style.display='';st.textContent='⏳ Mengupload foto...';st.style.color='var(--t3)';
+  _uploading=true;
+  try{
+    const fd=new FormData();fd.append('file',file);
+    bar(true);
+    const r=await fetch('/api/upload',{method:'POST',body:fd});
+    const j=await r.json();
+    bar(false);
+    if(!j.ok) throw new Error(j.message||'Upload gagal');
+    window._uploadedPhotoUrl=j.url;
+    st.textContent='✓ Foto berhasil diupload';st.style.color='var(--em)';
+  }catch(e){
+    bar(false);
+    st.textContent='✕ Upload gagal: '+e.message;st.style.color='var(--red)';
+    window._uploadedPhotoUrl='';
+    pre.classList.remove('show');hint.classList.remove('hide');drop.classList.remove('has');
+    pre.src='';
+  }
+  _uploading=false;
+}
+
+// ── WRITE REVIEW
+function openWriteModal(){
+  if(!_token){window._pendingWrite=true;openAuthModal();return}
+  document.getElementById('writeBg').classList.remove('hide');
+  _selectedStar=0;window._uploadedPhotoUrl='';
+  document.getElementById('revName').value=_username||'';
+  document.getElementById('revText').value='';
+  document.getElementById('revErr').classList.remove('show');
+  document.getElementById('photoPre').classList.remove('show');
+  document.getElementById('photoPre').src='';
+  document.getElementById('photoHint').classList.remove('hide');
+  document.getElementById('photoDrop').classList.remove('has');
+  document.getElementById('photoStatus').style.display='none';
+  document.getElementById('photoFile').value='';
+  document.querySelectorAll('#starSel span').forEach(s=>{s.style.opacity='.25';s.style.filter='grayscale(1)';});
+  document.getElementById('starLabel').textContent='Pilih bintang';
+  document.getElementById('starLabel').style.color='var(--t3)';
+}
+function closeWriteModal(){document.getElementById('writeBg').classList.add('hide')}
+
+async function submitReview(){
+  if(_uploading){toast('Tunggu foto selesai diupload','warn');return}
+  const err=document.getElementById('revErr');
+  const name=document.getElementById('revName').value.trim();
+  const text=document.getElementById('revText').value.trim();
+  const photo=window._uploadedPhotoUrl||'';
+  err.classList.remove('show');
+  if(!_selectedStar){err.textContent='Pilih rating bintang dulu.';err.classList.add('show');return}
+  if(!name||name.length<2){err.textContent='Nama minimal 2 karakter.';err.classList.add('show');return}
+  if(!text||text.length<5){err.textContent='Ulasan minimal 5 karakter.';err.classList.add('show');return}
+  const btn=document.getElementById('revSubmitBtn');
+  btn.disabled=true;btn.innerHTML='<span class="spin">⏳</span> Mengirim...';
+  try{
+    const r=await fetch('/api/reviews',{method:'POST',headers:{'Content-Type':'application/json','x-user-token':_token},body:JSON.stringify({star:_selectedStar,displayName:name,text,photoUrl:photo})});
+    const j=await r.json();
+    if(!j.ok){err.textContent=j.message||'Gagal';err.classList.add('show');return}
+    toast('Ulasan berhasil dikirim! Terima kasih 🙏','ok',4000);
+    closeWriteModal();
+    loadReviews();
+  }catch(e){err.textContent='Error: '+e.message;err.classList.add('show');}
+  finally{btn.disabled=false;btn.innerHTML='<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg> Kirim Ulasan';}
+}
+
+// ── FILTERS
+function filterByStar(s){
+  _curStar=s;_curPage=1;_photoOnly=false;
+  document.querySelectorAll('.stat-tag').forEach(b=>{
+    b.classList.toggle('on',parseInt(b.dataset.star||'-99')===s&&!b.dataset.photo);
+  });
+  loadReviews();
+}
+function filterPhoto(){
+  _photoOnly=!_photoOnly;_curPage=1;_curStar=0;
+  document.querySelectorAll('.stat-tag').forEach(b=>{
+    if(b.dataset.photo) b.classList.toggle('on',_photoOnly);
+    else b.classList.remove('on');
+  });
+  if(!_photoOnly){
+    document.querySelector('.stat-tag[data-star="0"]').classList.add('on');
+  }
+  loadReviews();
+}
+function setSort(s){
+  _curSort=s;_curPage=1;
+  document.querySelectorAll('.sort-btn').forEach(b=>{b.classList.toggle('on',b.dataset.sort===s);});
+  loadReviews();
+}
+
+// ── HELPFUL
+async function markHelpful(id,btn){
+  if(_helpedIds.has(id)){toast('Sudah ditandai sebelumnya','warn');return}
+  _helpedIds.add(id);localStorage.setItem('helpedRevIds',JSON.stringify([..._helpedIds]));
+  btn.classList.add('voted');
+  try{
+    const r=await fetch('/api/reviews/'+id+'/helpful',{method:'POST'});
+    const j=await r.json();
+    if(j.ok) btn.querySelector('.hcount').textContent=j.helpful;
+  }catch(e){}
+}
+
+// ── DELETE (admin)
+async function deleteReview(id){
+  if(!confirm('Hapus ulasan ini?')) return;
+  try{
+    const r=await fetch('/api/reviews/'+id,{method:'DELETE',headers:{'x-admin-token':_adminToken}});
+    const j=await r.json();
+    if(j.ok){toast('Ulasan dihapus','ok');loadReviews();}
+    else toast(j.message||'Gagal','err');
+  }catch(e){toast('Error: '+e.message,'err');}
+}
+
+// ── LOAD REVIEWS
+async function loadReviews(){
+  const wrap=document.getElementById('reviewsWrap');
+  wrap.innerHTML='<div class="skel-card skeleton"></div><div class="skel-card skeleton"></div><div class="skel-card skeleton"></div>';
+  document.getElementById('pager').style.display='none';
+  bar(true);
+  try{
+    let url=`/api/reviews?page=${_curPage}&sort=${_curSort}&star=${_curStar}`;
+    if(_photoOnly) url+='&photo=1';
+    const r=await fetch(url);
+    const j=await r.json();
+    bar(false);
+    if(!j.ok){wrap.innerHTML='<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Gagal memuat</div><div class="empty-sub">'+esc(j.message)+'</div></div>';return}
+
+    // Update stats
+    updateStats(j);
+
+    if(!j.reviews||j.reviews.length===0){
+      wrap.innerHTML=`<div class="empty-state"><div class="empty-icon">🌟</div><div class="empty-title">Belum ada ulasan</div><div class="empty-sub">Jadilah yang pertama memberikan ulasan!<br>Klik "Tulis Ulasan" di atas.</div></div>`;
+      return;
+    }
+
+    // Render
+    const isAdmin=!!(_adminToken&&true);
+    wrap.innerHTML=j.reviews.map((rv,idx)=>renderCard(rv,idx,isAdmin)).join('');
+
+    // Pagination
+    renderPager(j.page,j.pages,j.total);
+  }catch(e){
+    bar(false);
+    wrap.innerHTML='<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Gagal memuat</div><div class="empty-sub">'+esc(e.message)+'</div></div>';
+  }
+}
+
+function renderCard(rv,idx,isAdmin){
+  const initials=(rv.displayName||'?').charAt(0).toUpperCase();
+  const colors=['--em-rgb','--sky-rgb','--pur-rgb','--yel-rgb'];
+  const col='rgba('+getComputedStyle(document.documentElement).getPropertyValue(colors[rv.username.charCodeAt(0)%colors.length])+', .15)';
+  const colB='rgba('+getComputedStyle(document.documentElement).getPropertyValue(colors[rv.username.charCodeAt(0)%colors.length])+', .3)';
+  const timeAgo=fmtTime(rv.createdAt);
+  const helped=_helpedIds.has(rv.id);
+  const stars=renderStars(rv.star);
+  const photo=rv.photoUrl?`<img class="rv-photo" src="${esc(rv.photoUrl)}" alt="Foto ulasan" onclick="openLightbox('${esc(rv.photoUrl)}')" loading="lazy">`:'';
+  const adminDel=isAdmin?`<button class="rv-del-btn" onclick="deleteReview('${esc(rv.id)}')">🗑 Hapus</button>`:'';
+  return `<div class="rv-card" style="animation-delay:${idx*0.04}s">
+    <div class="rv-head">
+      <div class="rv-avatar" style="background:${col};border-color:${colB}">${initials}</div>
+      <div class="rv-meta">
+        <div class="rv-name">${esc(rv.displayName)}<span class="rv-badge verified">✓ Verified</span></div>
+        <div class="rv-stars">${stars}</div>
+        <div class="rv-date">${timeAgo}</div>
+      </div>
+    </div>
+    ${photo}
+    <div class="rv-text">${esc(rv.text)}</div>
+    <div class="rv-foot">
+      <button class="helpful-btn${helped?' voted':''}" onclick="markHelpful('${esc(rv.id)}',this)">
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+        Membantu <span class="hcount">${rv.helpful||0}</span>
+      </button>
+      ${adminDel}
+    </div>
+  </div>`;
+}
+
+function updateStats(j){
+  document.getElementById('avgNum').textContent=j.avgRating||'0.0';
+  document.getElementById('avgStars').innerHTML=renderStars(parseFloat(j.avgRating||0),'1rem');
+  document.getElementById('totalTxt').textContent=(j.totalAll||0)+' ulasan';
+  document.getElementById('tagAll').textContent=j.totalAll||0;
+  const sc=j.starCounts||{};
+  [1,2,3,4,5].forEach(s=>{
+    document.getElementById('c'+s).textContent=sc[s]||0;
+    document.getElementById('tag'+s).textContent=sc[s]||0;
+    const pct=(j.totalAll>0?((sc[s]||0)/j.totalAll*100):0).toFixed(0)+'%';
+    document.getElementById('b'+s).style.width=pct;
+  });
+  document.getElementById('tagPhoto').textContent=j.withPhoto||0;
+}
+
+function renderPager(cur,total,count){
+  const pg=document.getElementById('pager');
+  if(total<=1){pg.style.display='none';return}
+  pg.style.display='flex';
+  let h=`<button class="page-btn" onclick="gotoPage(${cur-1})" ${cur<=1?'disabled':''}>‹ Prev</button>`;
+  const from=Math.max(1,cur-2),to=Math.min(total,cur+2);
+  if(from>1) h+=`<button class="page-btn" onclick="gotoPage(1)">1</button>`;
+  if(from>2) h+=`<span class="page-info">…</span>`;
+  for(let i=from;i<=to;i++) h+=`<button class="page-btn${i===cur?' on':''}" onclick="gotoPage(${i})">${i}</button>`;
+  if(to<total-1) h+=`<span class="page-info">…</span>`;
+  if(to<total) h+=`<button class="page-btn" onclick="gotoPage(${total})">${total}</button>`;
+  h+=`<button class="page-btn" onclick="gotoPage(${cur+1})" ${cur>=total?'disabled':''}>Next ›</button>`;
+  pg.innerHTML=h;
+}
+
+function gotoPage(p){_curPage=p;loadReviews();window.scrollTo({top:0,behavior:'smooth'});}
+
+// ── LIGHTBOX
+function openLightbox(url){
+  document.getElementById('lbImg').src=url;
+  document.getElementById('lightbox').classList.add('on');
+}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('on');}
+
+// ── HELPERS
+function fmtTime(ts){
+  if(!ts) return '';
+  const diff=Date.now()-ts;
+  if(diff<60000) return 'Baru saja';
+  if(diff<3600000) return Math.floor(diff/60000)+' menit lalu';
+  if(diff<86400000) return Math.floor(diff/3600000)+' jam lalu';
+  if(diff<2592000000) return Math.floor(diff/86400000)+' hari lalu';
+  return new Date(ts).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});
+}
+function esc(s){
+  if(!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;');
+}
+
+// ── KEYBOARD
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeLightbox();closeWriteModal();closeAuthModal();}
+});
+
+// ── INIT
+initAuth();
+loadReviews();
+</script>
+</body>
+</html>
